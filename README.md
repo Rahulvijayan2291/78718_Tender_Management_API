@@ -1,92 +1,137 @@
-# wingsT4_TenderManagementAPI_SpringbootM
+# Tender Management API – Spring Boot
 
+This project is a REST API service built using Spring Boot for managing bidding details in a tender system. It supports operations for user authentication, bid creation, listing, updating, and deletion with role-based access control implemented using JWT.
 
+---
 
-## Getting started
+### Features  
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+1. **Authentication**  
+   - JWT-based authentication and role-based authorization for two roles: *BIDDER* and *APPROVER*.  
+   - JWT token is sent as a Bearer token in the Authorization header for secure communication.  
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+2. **Bid Management**  
+   - Add a Bid: Allows bidders to create a new bid.  
+   - Update Bid Status: Enables approvers to approve or reject bids.  
+   - Retrieve Bids: Fetch bids above a specified amount.  
+   - Delete Bid: Allows the creator or approver to remove a bid securely.  
 
-## Add your files
+---
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Models  
 
-```
-cd existing_repo
-git remote add origin https://code.fresco.me/Wings/wingst4_tendermanagementapi_springbootm.git
-git branch -M main
-git push -uf origin main
-```
+#### 1. RoleModel  
+| Attribute  | Type     | Description                          |  
+|------------|----------|--------------------------------------|  
+| id         | Integer  | Unique identifier, auto-incremented |  
+| rolename   | String   | Role name (e.g., BIDDER, APPROVER)   |  
 
-## Integrate with your tools
+#### 2. UserModel  
+| Attribute    | Type     | Description                          |  
+|--------------|----------|--------------------------------------|  
+| id           | Integer  | Unique identifier, auto-incremented |  
+| username     | String   | Name of the user                    |  
+| companyName  | String   | Associated company                  |  
+| email        | String   | Unique email                        |  
+| password     | String   | Encrypted password                  |  
+| role         | Integer  | Foreign key to RoleModel            |  
 
-- [ ] [Set up project integrations](https://code.fresco.me/Wings/wingst4_tendermanagementapi_springbootm/-/settings/integrations)
+#### 3. BiddingModel  
+| Attribute         | Type     | Description                            |  
+|-------------------|----------|----------------------------------------|  
+| id                | Integer  | Unique identifier, auto-incremented   |  
+| biddingId         | Integer  | Unique identifier for a bid           |  
+| projectName       | String   | Fixed project name: "Metro Phase V 2024" |  
+| bidAmount         | Double   | Amount of the bid                     |  
+| yearsToComplete   | Double   | Estimated completion time in years    |  
+| dateOfBidding     | String   | Date in dd/MM/yyyy format             |  
+| status            | String   | Default: "pending"                   |  
+| bidderId          | Integer  | Foreign key to UserModel for creator  |  
 
-## Collaborate with your team
+---
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+### API Endpoints  
 
-## Test and Deploy
+1. **Login**  
+   - **Endpoint**: `POST /login`  
+   - **Request Body**:  
+     ```json
+     { "email": "user@example.com", "password": "password123" }
+     ```  
+   - **Response**: JWT token for authorization.  
 
-Use the built-in continuous integration in GitLab.
+2. **Add a New Bid**  
+   - **Endpoint**: `POST /bidding/add`  
+   - **Request Body**:  
+     ```json
+     { "biddingId": 1001, "bidAmount": 5000000, "yearsToComplete": 2.5 }
+     ```  
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+3. **Retrieve Bids**  
+   - **Endpoint**: `GET /bidding/list?bidAmount=1000000`  
+   - **Response**: List of bids above the given amount.  
 
-***
+4. **Update Bid Status**  
+   - **Endpoint**: `PATCH /bidding/update/{id}`  
+   - **Request Body**:  
+     ```json
+     { "status": "approved" }
+     ```  
 
-# Editing this README
+5. **Delete a Bid**  
+   - **Endpoint**: `DELETE /bidding/delete/{id}`  
+   - **Conditions**: Only the creator or an approver can delete.  
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+---
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Prerequisites  
 
-## Name
-Choose a self-explaining name for your project.
+- Java 11 or higher  
+- Maven  
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+---
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Getting Started  
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+1. Clone the repository:  
+   ```bash
+   git clone https://github.com/your-username/tender-management-api.git  
+   cd tender-management-api  
+   ```  
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+2. Run the application:  
+   ```bash
+   mvn spring-boot:run  
+   ```  
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+3. Test the application:  
+   ```bash
+   mvn clean test  
+   ```  
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+4. Access the Swagger documentation at `/v3/api-docs`.  
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+---
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+### Technologies Used  
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- **Spring Boot**: Backend framework for RESTful APIs.  
+- **H2 Database**: In-memory database for testing.  
+- **JWT**: Token-based authentication.  
+- **Maven**: Dependency and build management.  
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+---
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### Contributions  
 
-## License
-For open source projects, say how it is licensed.
+Contributions are welcome! Please feel free to submit issues or pull requests to improve this project.  
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+If you'd like to support the development of this project, you can buy me a coffee:  
+**GPay**: +91-9074023334  
+
+Your support is greatly appreciated!  
+
+---
+
+**License**  
+This project is licensed under the MIT License.
