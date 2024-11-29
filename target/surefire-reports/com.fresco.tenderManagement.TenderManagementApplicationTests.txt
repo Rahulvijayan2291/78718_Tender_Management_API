@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.fresco.tenderManagement.TenderManagementApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.142 s - in com.fresco.tenderManagement.TenderManagementApplicationTests
